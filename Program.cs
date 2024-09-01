@@ -1,10 +1,18 @@
 using dotenv.net;
+using Microsoft.EntityFrameworkCore;
 using SignalRChat.Components;
+using SignalRChat.Data;
 using SignalRChat.Hubs;
 using SignalRChat.Services;
 
 // load connection strings from .env file into environment variables
 DotEnv.Load();
+
+// extract connection strings, api key and endpoint
+var dbConnectionString = Environment.GetEnvironmentVariable("AzureDb");
+var signalRConnectionString = Environment.GetEnvironmentVariable("AzureSignalR");
+var languageKey = Environment.GetEnvironmentVariable("LanguageKey");
+var languageEndpoint = Environment.GetEnvironmentVariable("LanguageEndpoint");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,15 +20,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// get AzureSignalR connection string from environment variables
-var connectionString = Environment.GetEnvironmentVariable("AzureSignalR");
+// add database context to DI container
+builder.Services.AddDbContext<ApplicationDbContext>(
+                options => options.UseSqlServer(dbConnectionString));
 
-// add SignalR Service with its Azure extension and provide connection string
-builder.Services.AddSignalR().AddAzureSignalR(connectionString);
+// add SignalR Service with its Azure extension
+builder.Services.AddSignalR().AddAzureSignalR(signalRConnectionString);
 
-var languageKey = Environment.GetEnvironmentVariable("LanguageKey");
-var languageEndpoint = Environment.GetEnvironmentVariable("LanguageEndpoint");
-
+// add LanguageService to DI container as singleton
 builder.Services.AddSingleton<LanguageService>(new LanguageService(
     languageEndpoint,
     languageKey));
