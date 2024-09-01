@@ -1,6 +1,8 @@
 ﻿@page "/chat"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.SignalR.Client
+@using SignalRChat.Services
+@inject LanguageService Language
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 
@@ -41,9 +43,10 @@
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<string, string>("ReceiveMessage", async (user, message) =>
         {
-            var encodedMsg = $"{user}: {message}";
+            var sentiment = await Language.AnalyzeSentimentAsync(message);
+            var encodedMsg = $"{user}: {message} [{sentiment}]";
             messages.Add(encodedMsg);
             InvokeAsync(StateHasChanged);
         });

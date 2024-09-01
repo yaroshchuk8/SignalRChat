@@ -1,6 +1,7 @@
 using dotenv.net;
 using SignalRChat.Components;
 using SignalRChat.Hubs;
+using SignalRChat.Services;
 
 // load connection strings from .env file into environment variables
 DotEnv.Load();
@@ -16,6 +17,13 @@ var connectionString = Environment.GetEnvironmentVariable("AzureSignalR");
 
 // add SignalR Service with its Azure extension and provide connection string
 builder.Services.AddSignalR().AddAzureSignalR(connectionString);
+
+var languageKey = Environment.GetEnvironmentVariable("LanguageKey");
+var languageEndpoint = Environment.GetEnvironmentVariable("LanguageEndpoint");
+
+builder.Services.AddSingleton<LanguageService>(new LanguageService(
+    languageEndpoint,
+    languageKey));
 
 var app = builder.Build();
 
