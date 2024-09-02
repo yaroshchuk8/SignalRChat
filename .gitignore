@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /.env
 /Properties/ServiceDependencies/signalrchat - Web Deploy/profile.arm.json
+/Properties/ServiceDependencies/signalrchat - Web Deploy1/profile.arm.json

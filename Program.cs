@@ -25,7 +25,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlServer(dbConnectionString));
 
 // add SignalR Service with its Azure extension
-builder.Services.AddSignalR().AddAzureSignalR(signalRConnectionString);
+builder.Services.AddSignalR().AddAzureSignalR(o => 
+    {   o.ConnectionString = signalRConnectionString;
+        o.InitialHubServerConnectionCount = 2;
+        o.MaxHubServerConnectionCount = 2;
+        });
 
 // add LanguageService to DI container as singleton
 builder.Services.AddSingleton<LanguageService>(new LanguageService(
